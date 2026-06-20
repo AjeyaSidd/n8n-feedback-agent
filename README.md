@@ -70,8 +70,9 @@ An example of the generated analytical HTML report is included in the repository
 > [!TIP]
 > **How to View this Sample Report:**
 > Since GitHub displays the raw code for HTML files by default, you can view the fully rendered version using one of these options:
-> - **Option 1 (Interactive Preview)**: Use the [HTMLPreview Service](https://htmlpreview.github.io/?https://github.com/YOUR_GITHUB_USERNAME/n8n-feedback-agent/blob/main/App_Review_Report_sample_output.html) (replace `YOUR_GITHUB_USERNAME` with your actual GitHub username).
-> - **Option 2 (Local View)**: Click on the file in GitHub, select the **Download raw file** button (or click **Raw** and press `Ctrl+S` / `Cmd+S` to save it), and double-click the file to open it in your web browser.
+> - **Option 1 (Interactive Preview)**: Once you commit and push this repository to GitHub, you can paste the GitHub URL of the HTML file into [HTMLPreview](https://htmlpreview.github.io/) to render it. 
+>   * Template URL: `https://htmlpreview.github.io/?https://github.com/<YOUR_GITHUB_USERNAME>/n8n-feedback-agent/blob/main/App_Review_Report_sample_output.html` (be sure to replace `<YOUR_GITHUB_USERNAME>` with your actual username).
+> - **Option 2 (Local View)**: Click on the file in your GitHub repo, click the **Download raw file** button (or click **Raw** and press `Ctrl+S` / `Cmd+S` to save it), then double-click the file to open it in your browser.
 
 
 
