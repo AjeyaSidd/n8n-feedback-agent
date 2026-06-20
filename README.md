@@ -1,0 +1,69 @@
+# n8n App Feedback Analyst Agent
+
+A production-grade, self-hosted n8n workflow that automates the collection, synthesis, and analysis of user reviews from the **Google Play Store** and **Apple App Store**. It leverages **Gemini Flash** to generate a beautifully styled, data-grounded HTML executive report, which is emailed weekly (or on-demand) via **Resend**.
+
+[![n8n Version](https://img.shields.io/badge/n8n-v1%2B-FF6F59?logo=n8n&style=flat-square)](https://n8n.io)
+[![Gemini](https://img.shields.io/badge/LLM-Gemini%20Flash-4A90E2?logo=google-gemini&style=flat-square)](https://deepmind.google/technologies/gemini/)
+[![Resend](https://img.shields.io/badge/Email-Resend-000000?logo=resend&style=flat-square)](https://resend.com)
+[![Render Hosting](https://img.shields.io/badge/Hosting-Render-46E3B7?logo=render&style=flat-square)](https://render.com)
+[![Supabase Database](https://img.shields.io/badge/Database-Supabase-3ECF8E?logo=supabase&style=flat-square)](https://supabase.com)
+
+---
+
+## 📋 Architectural Overview
+
+The agent executes either on a periodic cron schedule or via an HTTP Webhook. Here is how the review harvesting and analysis pipeline functions:
+
+```mermaid
+graph TD
+    Trigger[Manual Trigger / Webhook] --> Config[Config Node: Load App list & Settings]
+    Config --> Split[Split Out: Iterate over each app]
+    
+    %% Parallel Scraping
+    Split --> AppStore[Get App Store Reviews: iTunes RSS]
+    Split --> PlayStore[Get Play Store Reviews: Render Scraper API]
+    
+    %% Merging & Processing
+    AppStore --> Merge[Merge Reviews]
+    PlayStore --> Merge
+    Merge --> Combine[Combine & Group Reviews by App]
+    
+    %% LLM Synthesizer
+    Combine --> Prompt[Create LLM Prompt with Strict Rules]
+    Prompt --> Gemini[Call Gemini Flash API]
+    Gemini --> Extract[Extract & Clean HTML Report]
+    
+    %% Email Delivery
+    Extract --> Resend[Send Email via Resend Client]
+```
+
+---
+
+## ✨ Features
+
+- **Multi-Store Aggregation**: Fetches reviews from both iTunes RSS Feed (App Store) and a custom hosted Play Store Scraper API concurrently.
+- **Strict Data Grounding**: The LLM prompt enforces strict alignment rules—it will only report complaints supported by at least 2 distinct user reviews to eliminate hallucinations.
+- **Platform-Specific Insights**: Pinpoints whether a bug, payment failure, or crash is isolated to `[App Store]`, `[Play Store]`, or affects `[Both Stores]`.
+- **Text-Based Sentiment Analysis**: Overrides contradictory star ratings by performing deep text sentiment analysis to classify reviews into positive, negative, neutral, or mixed.
+- **Store-to-Store Comparison**: Provides direct comparison metrics showing language intensity, complaint overlap, and sentiment distribution between iOS and Android versions.
+- **Premium HTML Email Output**: Generates a self-contained, beautifully styled HTML email report (featuring rounded app logos, colored sentiment pills, alert callouts, and clean tables) delivered straight to your inbox.
+
+---
+
+## 📂 Repository Contents
+
+* [workflow.json](file:///c:/Users/Ajeya%20Siddhartha/Projects/n8n-feedback-agent/workflow.json) - The ready-to-import n8n workflow configuration file.
+* [SETUP.md](file:///c:/Users/Ajeya%20Siddhartha/Projects/n8n-feedback-agent/SETUP.md) - Complete instructions for setting up Supabase, Render, the Play Store Scraper, and n8n credentials.
+
+---
+
+## 🚀 Quick Start Summary
+
+1. Create a free-tier **Supabase** instance to use as the PostgreSQL backend.
+2. Deploy **n8n** on **Render** using the official Docker image connected to your Supabase instance.
+3. Deploy the open-source **Play Store Scraper API** on **Render**.
+4. Import `workflow.json` into n8n.
+5. Add your **Gemini** and **Resend** API keys to the credentials in n8n.
+6. Customize the apps list and email addresses inside the `Config` node and run!
+
+For detailed step-by-step instructions, see the [Setup Guide](file:///c:/Users/Ajeya%20Siddhartha/Projects/n8n-feedback-agent/SETUP.md).

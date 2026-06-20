@@ -1,0 +1,379 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// ============================================\n// AGENT CONFIGURATION — edit only this node\n// ============================================\n\nconst config = {\n  \n  // Email to receive the report\n  reportEmail: \"YOUR_EMAIL@example.com\",\n  \n  // Which stores to pull reviews from\n  // Options: \"both\" | \"appstore\" | \"playstore\"\n  stores: \"both\",\n  \n  // Number of recent reviews to fetch per app per store\n  reviewCount: 200,\n\n  // Scraper API base URL — change only here if it ever changes\n  scraperApiUrl: \"https://your-playstore-scraper-api.onrender.com\",\n\n \n  geminiApiUrl: \"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent\",\n  \n  // Apps to analyze\n  // For each app provide:\n  //   name        - friendly name for the report\n  //   appStoreId  - numeric ID from App Store URL (null if not on App Store)\n  //   playStoreId - package name from Play Store URL (null if not on Play Store)\n  //   logourl     - app's logo url from playstore for displaying in the report \n  apps: [\n    {\n      name: \"BigBasket\",\n      appStoreId: \"660683603\",\n      playStoreId: \"com.bigbasket.mobileapp\",\n      logoUrl: \"https://play-lh.googleusercontent.com/EuiZnkT8aEKjXDLX74DTp1VRIwWaeRa8Dvo-LOGAxy1FPQ8GzABTIRenksiM-A7Oz48g=w480-h960-rw\"\n    },\n    {\n    \n      name: \"MyGate\",\n      appStoreId: \"1101762651\",\n      playStoreId: \"com.mygate.user\",\n      logoUrl: \"https://play-lh.googleusercontent.com/gTgy9Nvj_jvHIgCq5V0WNghXwbMh0rsgo9kBjzTWcolYfsgmoL9UeGxelK4rY_AvB4AuGyr4HW5cCGcgznyhOg=w480-h960-rw\"\n    },\n    \n    {\n      name: \"Groww\",\n      appStoreId: \"1404871703\",\n      playStoreId: \"com.nextbillion.groww\",\n      logoUrl: \"https://play-lh.googleusercontent.com/LHjOai6kf1IsstKNWO9jbMxD-ix_FVYaJSLodKCqYQdoFVzQBuV9z5txxzcTagQcyX8=s96-rw\"\n    },\n    {\n      name: \"Zerodha\",\n      appStoreId: \"1449453802\",\n      playStoreId: \"com.zerodha.kite3\",\n      logoUrl: \"https://play-lh.googleusercontent.com/wnNYBAH1m-XJMfduOHfEATQAhCwyKUYeHAD1Fi9-OjtxKyPKjFEmgWvbx-OX2dM65xjp=s96-rw\"\n    },\n    {\n      name: \"Home Workout\",\n      appStoreId: \"313192037\",\n      playStoreId: \"homeworkout.homeworkouts.noequipment\",\n      logoUrl: \"https://play-lh.googleusercontent.com/NlQFS5pgo96dzbRuwZfkBhGf3ecKSGH5lRx0DSsmELYZXRYHlXrd7YVCR7tS7-R84eEVLhZ1qBIQj1WP_RCJAQ=w480-h960-rw\"\n    }\n  ]\n\n};\n\n// Pass config forward to next nodes\nreturn [{ json: config }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -832,
+        -80
+      ],
+      "id": "43ae8d47-3bf8-498a-a291-60793b1e476a",
+      "name": "Config"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pull app list directly from Config node — single source of truth\nconst config = $('Config').first().json;\nconst apps = config.apps || [];\n\n// Dynamically build lookup maps from config\nconst appStoreIdMap = {};\nconst playStoreIdMap = {};\nfor (const app of apps) {\n  if (app.appStoreId) appStoreIdMap[String(app.appStoreId)] = app.name;\n  if (app.playStoreId) playStoreIdMap[app.playStoreId] = app.name;\n}\n\nconst items = $input.all();\nconst allReviews = [];\n\nfor (const item of items) {\n\n  // Handle App Store — stringified JSON in item.json.data\n  if (item.json?.data && typeof item.json.data === 'string') {\n    try {\n      const parsed = JSON.parse(item.json.data);\n      const feed = parsed?.feed;\n      if (feed?.entry) {\n        // Extract app ID from feed self link\n        const selfLink = feed.link?.find(l => l.attributes?.rel === 'self')?.attributes?.href || '';\n        const idMatch = selfLink.match(/id=(\\d+)/);\n        const appId = idMatch ? idMatch[1] : '';\n        const appName = appStoreIdMap[appId] || 'Unknown App';\n\n        const entries = Array.isArray(feed.entry) ? feed.entry : [feed.entry];\n        for (const entry of entries) {\n          if (!entry['im:rating']) continue;\n          allReviews.push({\n            app: appName,\n            store: 'App Store',\n            rating: parseInt(entry['im:rating']?.label || '0'),\n            title: entry.title?.label || '',\n            review: entry.content?.label || '',\n            author: entry.author?.name?.label || 'Anonymous',\n            date: entry.updated?.label || ''\n          });\n        }\n      }\n    } catch(e) {}\n  }\n\n  // Handle Play Store — data at item.json.results.data\n  const playReviews = item.json?.results?.data;\n  if (Array.isArray(playReviews)) {\n    for (const r of playReviews) {\n      // Extract package name from Play Store URL\n     const packageMatch = (r.url || '').match(/[?&]id=([^&]+)/);\n      const packageName = packageMatch ? packageMatch[1] : '';\n      const appName = playStoreIdMap[packageName] || 'Unknown App';\n\n      allReviews.push({\n        app: appName,\n        store: 'Play Store',\n        rating: r.score || 0,\n        title: '',\n        review: r.text || '',\n        author: r.userName || 'Anonymous',\n        date: r.date || ''\n      });\n    }\n  }\n}\n\nreturn [{\n  json: {\n    totalReviews: allReviews.length,\n    reviews: allReviews,\n    fetchedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -64
+      ],
+      "id": "29e33b34-16d1-486e-88c8-3d0182a21b56",
+      "name": "Combine Reviews"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -80,
+        -64
+      ],
+      "id": "1f17f5e8-3c65-43e1-beab-9ea6b867bf12",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "=https://itunes.apple.com/in/rss/customerreviews/id={{ $input.item.json.appStoreId }}/sortBy=mostRecent/json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json, text/plain, */*"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "Referer",
+              "value": "https://apps.apple.com/"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -352,
+        -144
+      ],
+      "id": "5ce2340e-1383-43f4-b53d-173e28e3a20f",
+      "name": "Get App Store Reviews",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.scraperApiUrl }}/api/apps/{{ $input.item.json.playStoreId }}/reviews?lang=en&country=in&num=$('Config').first().json.reviewCount }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\",\n  \"Accept\": \"text/html,application/json,*/*\",\n  \"Accept-Language\": \"en-US,en;q=0.9\"\n}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 10000
+            }
+          },
+          "lowercaseHeaders": false,
+          "redirect": {
+            "redirect": {}
+          },
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -352,
+        32
+      ],
+      "id": "7f791ab7-d2ed-4d56-98d8-83d9efad2df1",
+      "name": "Get PlayStore Reviews",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 4
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "apps",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -80
+      ],
+      "id": "2b865b41-0210-4742-8d27-eee572ba50f3",
+      "name": "Split Out (send each app from Config)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst config = $('Config').first().json;\nconst reviews = data.reviews || [];\n\n// Group reviews by app\nconst grouped = {};\nfor (const r of reviews) {\n  const key = r.app;\n  if (!grouped[key]) grouped[key] = [];\n  grouped[key].push(r);\n}\n\n// Build app metadata map from config\nconst appMeta = {};\nfor (const app of config.apps) {\n  appMeta[app.name] = {\n    logoUrl: app.logoUrl || '',\n    appStoreId: app.appStoreId || '',\n    playStoreId: app.playStoreId || ''\n  };\n}\n\n// Build review text per app with metadata\nlet reviewText = '';\nconst reportMetadata = {};\n\nfor (const [appName, appReviews] of Object.entries(grouped)) {\n  const avgRating = (appReviews.reduce((s, r) => s + r.rating, 0) / appReviews.length).toFixed(1);\n\n  // Count by store\n  const storeBreakdown = {};\n  for (const r of appReviews) {\n    storeBreakdown[r.store] = (storeBreakdown[r.store] || 0) + 1;\n  }\n\n  // Human readable store summary\n  const storeSummaryParts = Object.entries(storeBreakdown).map(([store, count]) => `${count} from ${store}`);\n  const storeSummary = storeSummaryParts.join(' and ');\n  const storesCovered = Object.keys(storeBreakdown);\n  const storesCoveredLabel = storesCovered.length === 2\n    ? 'App Store and Play Store'\n    : `${storesCovered[0]} only`;\n\n  // Date range\n  const dates = appReviews.map(r => new Date(r.date)).filter(d => !isNaN(d));\n  const newestDate = dates.length ? new Date(Math.max(...dates)).toDateString() : 'N/A';\n  const oldestDate = dates.length ? new Date(Math.min(...dates)).toDateString() : 'N/A';\n\n  reportMetadata[appName] = {\n    totalReviews: appReviews.length,\n    storeSummary,\n    storesCoveredLabel,\n    dateRange: `${oldestDate} to ${newestDate}`,\n    avgRating\n  };\n\n  reviewText += `\\n\\n=== ${appName} | ${appReviews.length} reviews (${storeSummary}) | Avg: ${avgRating}/5 ===`;\n  reviewText += `\\nDATA COVERAGE: ${appReviews.length} most recent reviews from ${storesCoveredLabel}, dated ${oldestDate} to ${newestDate}\\n`;\n\n  for (const r of appReviews) {\n    if (!r.review || r.review.trim().length < 5) continue;\n    reviewText += `[${r.rating}★][${r.store}] ${r.title ? r.title + ': ' : ''}${r.review}\\n`;\n  }\n}\n\nconst appMetaJson = JSON.stringify(appMeta);\n\nconst prompt = `You are a product analyst. Analyze the following app store \nreviews and generate a complete, self-contained HTML email \nreport.\n\nAPP METADATA (use for logos and display):\n${appMetaJson}\n\nREVIEWS DATA:\n${reviewText}\n\nGenerate a complete HTML document with inline CSS \n(no external stylesheets). The report should:\n\nDESIGN:\n- Clean white background, professional font (Arial/Helvetica)\n- A header bar with dark background (#1a1a2e) showing \n  \"App Reviews Report for [comma separated list of apps]\" \n  and the date\n- For each app: show the app logo (60x60px rounded), \n  app name as heading\n- Color-coded sentiment badge: green for positive majority, \n  red for negative majority, orange for mixed\n- Section cards with light grey background (#f8f9fa), \n  subtle border, padding\n- Complaint items in light red pills, praise items in \n  light green pills\n- Critical issues highlighted in a red-bordered alert box\n- Clean bullet points for recommendations\n- Footer with generation timestamp\n\nANALYSIS APPROACH:\n- STRICT DATA GROUNDING: Generate ALL insights, complaints, \n  praises, themes, and recommendations exclusively from the \n  review text provided. Do not infer, assume, or extrapolate \n  from general knowledge about the app or industry. If a \n  complaint is not explicitly stated in at least 2 separate \n  reviews, do not include it. Every insight must be \n  traceable to specific reviews in the data provided.\n- Synthesize insights holistically across both stores where \n  data exists — do not repeat the same point twice\n- For general issues, report as a unified insight without \n  mentioning the store\n- EXCEPTION: for technical issues (app crashes, login \n  failures, payment bugs, UI glitches, performance, \n  OS-specific errors) — always mention which store the \n  issue was reported from [App Store] / [Play Store] / \n  [Both Stores]\n- Frequency estimates should reflect combined review count\n\nSECTIONS FOR EACH APP:\n\n1. App header with logo, name, sentiment badge (DO NOT show \n   star rating or numeric rating), and a metadata chip \n   showing e.g. \"Based on 200 most recent reviews · \n   App Store + Play Store · Apr 15–17 2026\"\n\n2. Overall Sentiment Analysis:\n   \n   Classification rules:\n   - Classify each review by TEXT CONTENT, not star rating\n   - Positive: text expresses satisfaction, praise, or \n     recommendation regardless of star rating\n   - Negative: text expresses frustration, complaint, \n     dissatisfaction, or warning to others\n   - Neutral: factual observations with no clear emotional \n     valence\n   - Mixed: significant praise AND significant complaint \n     in same review — count as 0.5 positive + 0.5 negative\n   - Single generic words (\"good\", \"nice\", \"ok\") without \n     context — exclude from sentiment calculation entirely\n   - Where star rating contradicts text sentiment, \n     trust the text\n   \n   Output:\n   - % positive / % negative / % neutral (must sum to 100%)\n   - Note if star rating distribution significantly differs \n     from text sentiment — this gap is itself a product \n     signal worth surfacing\n   - One-line summary of the dominant sentiment theme\n\n3. Top Complaints — top 3-5 recurring issues as red pills, \n   each with approximate % of reviews mentioning it. \n   Unified across stores unless platform-specific. Only \n   include if mentioned in at least 2 separate reviews.\n\n4. Top Praises — top 2-3 things users explicitly praise \n   as green pills, each with approximate frequency. Only \n   include if genuinely present in review text — do not \n   invent praises if the data does not support them.\n\n5. Technical Issues — only include if genuine technical \n   complaints exist (crashes, bugs, payment failures, \n   login issues, performance). Each issue must specify \n   [App Store] / [Play Store] / [Both Stores]. Red-bordered \n   alert box. Skip entirely if no technical issues exist.\n\n6. Key Themes — 3-5 high-level conceptual themes that \n   characterise the user experience, distinct from specific \n   complaints. Should be broader patterns e.g. \"Trust \n   erosion\", \"Accountability gap\", \"Expectation mismatch\" \n   — not repetitions of complaints listed above.\n\n7. Actionable Recommendations — 2-3 specific, prioritised \n   recommendations. Each must:\n   - Be directly traceable to a complaint in the data above\n   - State WHAT to fix, not just THAT it needs fixing\n   - Reference the approximate % of reviews that support it\n   e.g. \"Introduce proactive delay notifications — 68% of \n   negative reviews cite unexpected delays with no \n   communication\"\n\n8. Store Experience Comparison — ONLY if reviews exist \n   from BOTH stores. Compare:\n   - Sentiment distribution across platforms\n   - Whether top complaints are the same or different\n   - Complaints exclusive to one platform\n   - Language intensity differences between platforms\n   If experience is identical, state clearly: \"No \n   meaningful difference between iOS and Android user \n   experience based on available reviews\"\n\nIMPORTANT:\n- Return ONLY the complete HTML document starting with \n  <!DOCTYPE html>\n- All CSS must be inline or in a <style> tag in <head>\n- No markdown, no explanation, just the HTML\n- Make it look like a professional product analytics report\n- Quote actual user language where impactful — specific \n  phrases from reviews are more credible than paraphrasing\n- If fewer than 10 substantive reviews are available from \n  a given store, note \"Insufficient data from [store] \n  for reliable analysis\" rather than generating insights \n  from too small a sample`;\n\n\n\n// NEW — return plain object\nreturn [{\n  json: {\n    body: {\n      contents: [\n        {\n          role: \"user\",\n          parts: [{ text: prompt }]\n        }\n      ],\n      generationConfig: {\n        temperature: 0.3,\n        maxOutputTokens: 65536\n      }\n    },\n    reportMetadata,\n    totalReviews: data.totalReviews,\n    fetchedAt: data.fetchedAt\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -64
+      ],
+      "id": "5f58239c-0d54-448c-aa09-c763aba50b8b",
+      "name": "Create Prompt for review analysis"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$('Config').first().json.geminiApiUrl}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        560,
+        -64
+      ],
+      "id": "0aa7973a-317a-44dd-a089-8fda5b6f6d4f",
+      "name": "Call LLM API",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "GWwwReLOfSYAPXbu",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\n\nlet report = response?.candidates?.[0]?.content?.parts?.[0]?.text || '';\n\nreport = report.replace(/^```html\\n?/i, '').replace(/```$/i, '').trim();\n\nreturn [{\n  json: {\n    report,\n    reportBase64: Buffer.from(report, 'utf8').toString('base64'),\n    generatedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        208
+      ],
+      "id": "b3b246c6-1a54-43c4-8b00-8cf3464268c9",
+      "name": "Extract LLM response"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"from\": \"onboarding@resend.dev\",\n  \"to\": \"YOUR_EMAIL@example.com\",\n  \"subject\": \"App Review Report — {{$now.toFormat('d MMMM yyyy')}}\",\n  \"text\": \"Hello, please find the attached weekly App Review Report.\",\n  \"attachments\": [\n    {\n      \"filename\": \"App_Review_Report.html\",\n      \"content\": \"{{$json.reportBase64}}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        160,
+        208
+      ],
+      "id": "f869697a-9ce5-4ec1-a147-019a711816ba",
+      "name": "Send report",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "XyRNnTAkm2JUHm79",
+          "name": "Resend api auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "app-review-agent",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1040,
+        -80
+      ],
+      "id": "915c569b-ba7d-4e02-ac00-e18de4ba9195",
+      "name": "Webhook",
+      "webhookId": "1930a476-2891-4719-bfee-d13f25970978"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        128
+      ],
+      "id": "61f10d03-38af-4f08-b249-e9d5e69fcddc",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Split Out (send each app from Config)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Reviews": {
+      "main": [
+        [
+          {
+            "node": "Create Prompt for review analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Combine Reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get App Store Reviews": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get PlayStore Reviews": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Split Out (send each app from Config)": {
+      "main": [
+        [
+          {
+            "node": "Get App Store Reviews",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get PlayStore Reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Prompt for review analysis": {
+      "main": [
+        [
+          {
+            "node": "Call LLM API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call LLM API": {
+      "main": [
+        [
+          {
+            "node": "Extract LLM response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract LLM response": {
+      "main": [
+        [
+          {
+            "node": "Send report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send report": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "f0edf472df03952e9c7a4c2cd6ecfb5b782835e0bc1575f824085cd667b1d79d"
+  }
+}
