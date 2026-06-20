@@ -1,6 +1,6 @@
 # n8n App Feedback Analyst Agent
 
-A production-grade, self-hosted n8n workflow that automates the collection, synthesis, and analysis of user reviews from the **Google Play Store** and **Apple App Store**. It leverages **Gemini Flash** to generate a beautifully styled, data-grounded HTML executive report, which is emailed weekly (or on-demand) via **Resend**.
+A self-hosted n8n workflow that automates the collection, synthesis, and analysis of user reviews from the **Google Play Store** and **Apple App Store**. It leverages **Gemini Flash** to generate a beautifully styled, data-grounded HTML executive report, which is emailed weekly (or on-demand) via **Resend**.
 
 [![n8n Version](https://img.shields.io/badge/n8n-v1%2B-FF6F59?logo=n8n&style=flat-square)](https://n8n.io)
 [![Gemini](https://img.shields.io/badge/LLM-Gemini%20Flash-4A90E2?logo=google-gemini&style=flat-square)](https://deepmind.google/technologies/gemini/)
