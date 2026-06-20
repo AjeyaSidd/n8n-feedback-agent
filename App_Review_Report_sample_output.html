@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Reviews Product Analysis Report</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .header {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 10px 0 0;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .app-card {
+            background-color: #ffffff;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .app-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .app-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        .app-info h2 {
+            margin: 0;
+            font-size: 22px;
+            color: #1a1a2e;
+        }
+        .metadata-chip {
+            display: inline-block;
+            background-color: #f1f3f5;
+            color: #666;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 5px;
+        }
+        .sentiment-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+        .badge-red { background-color: #ffe3e3; color: #e03131; }
+        .badge-green { background-color: #ebfbee; color: #2f9e44; }
+        .badge-orange { background-color: #fff4e6; color: #fd7e14; }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 25px 0 15px;
+            color: #495057;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .sentiment-bar {
+            height: 10px;
+            display: flex;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .pill {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .pill-red { background-color: #fff5f5; color: #c92a2a; border: 1px solid #ffc9c9; }
+        .pill-green { background-color: #f4fce3; color: #5c940d; border: 1px solid #d8f5a2; }
+        
+        .alert-box {
+            border: 1px solid #ffc9c9;
+            border-left: 4px solid #fa5252;
+            background-color: #fff5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .alert-box h4 { margin: 0 0 10px; color: #c92a2a; font-size: 14px; }
+        
+        .theme-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .theme-card strong { color: #1a1a2e; display: block; margin-bottom: 5px; }
+        
+        .recommendations ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        .recommendations li {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 12px;
+            color: #868e96;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>App Reviews Report: Swiggy, Zomato, MyGate, Smytten</h1>
+        <p>Analysis Period: April 18 – April 30, 2026</p>
+    </div>
+
+    <div class="container">
+
+        <!-- SWIGGY SECTION -->
+        <div class="app-card">
+            <div class="app-header">
+                <img src="https://play-lh.googleusercontent.com/ymXDmYihTOzgPDddKSvZRKzXkboAapBF2yoFIeQBaWSAJmC9IUpSPKgvfaAgS5yFxQ=w480-h960-rw" class="app-logo" alt="Swiggy Logo">
+                <div class="app-info">
+                    <h2>Swiggy</h2>
+                    <div class="metadata-chip">150 reviews · Play Store · Apr 29–30 2026</div>
+                </div>
+                <div class="sentiment-badge badge-red">Critical Negative</div>
+            </div>
+
+            <div class="section-title">Overall Sentiment Analysis</div>
+            <div class="sentiment-bar">
+                <div style="width: 4%; background-color: #2f9e44;"></div>
+                <div style="width: 94%; background-color: #e03131;"></div>
+                <div style="width: 2%; background-color: #adb5bd;"></div>
+            </div>
+            <p style="font-size: 14px;"><strong>4% Positive / 94% Negative / 2% Neutral</strong></p>
+            <p style="font-size: 14px; font-style: italic;">Dominant Theme: Severe breakdown in delivery reliability and customer support accountability.</p>
+
+            <div class="section-title">Top Complaints</div>
+            <div class="pill-container">
+                <div class="pill pill-red">Extreme Delivery Delays (1-3 hrs) ~48%</div>
+                <div class="pill pill-red">Ineffective AI/Bot Support ~42%</div>
+                <div class="pill pill-red">Refund Denials/Failures ~35%</div>
+                <div class="pill pill-red">High Platform/Surge Fees ~20%</div>
+                <div class="pill pill-red">Unfair Cancellation Charges ~15%</div>
+            </div>
+
+            <div class="section-title">Top Praises</div>
+            <div class="pill-container">
+                <div class="pill pill-green">Grocery/Food Variety ~3%</div>
+            </div>
+
+            <div class="alert-box">
+                <h4>Technical Issues</h4>
+                <ul style="font-size: 13px; margin: 0; padding-left: 15px;">
+                    <li><strong>Login Failures:</strong> Users unable to access accounts or switch between mobile numbers [Play Store].</li>
+                    <li><strong>Tracking Inaccuracy:</strong> Real-time tracking mechanism disseminates misleading information [Play Store].</li>
+                    <li><strong>Checkout Glitches:</strong> "Swiggy Money" disappearing during the payment process [Play Store].</li>
+                </ul>
+            </div>
+
+            <div class="section-title">Key Themes</div>
+            <div class="theme-card">
+                <strong>Accountability Gap</strong>
+                Orders are frequently marked "Delivered" without reaching the customer, with support agents refusing to investigate or provide proof.
+            </div>
+            <div class="theme-card">
+                <strong>The "AI Farce"</strong>
+                Users feel trapped in a "chatbot circle" that provides scripted replies and prevents access to human agents for complex issues.
+            </div>
+
+            <div class="section-title">Actionable Recommendations</div>
+            <div class="recommendations">
+                <ul>
+                    <li><strong>Humanize High-Value Disputes:</strong> Disable mandatory AI triage for orders over ₹500 or those delayed by >60 mins (42% of users cite bot frustration).</li>
+                    <li><strong>Transparent Cancellation Policy:</strong> Disclose exact cancellation fees before the user confirms a cancellation (15% cite "betrayal" over 100% fees).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ZOMATO SECTION -->
+        <div class="app-card">
+            <div class="app-header">
+                <img src="https://play-lh.googleusercontent.com/HJdzprqlCwh_8YNyhMBU6rIaGBGwxHXflZuuqI3iR4US7Jb-bSYiJk_DKV2la9SoBM0K=w480-h960-rw" class="app-logo" alt="Zomato Logo">
+                <div class="app-info">
+                    <h2>Zomato</h2>
+                    <div class="metadata-chip">150 reviews · Play Store · Apr 29–30 2026</div>
+                </div>
+                <div class="sentiment-badge badge-green">Mostly Positive</div>
+            </div>
+
+            <div class="section-title">Overall Sentiment Analysis</div>
+            <div class="sentiment-bar">
+                <div style="width: 76%; background-color: #2f9e44;"></div>
+                <div style="width: 20%; background-color: #e03131;"></div>
+                <div style="width: 4%; background-color: #adb5bd;"></div>
+            </div>
+            <p style="font-size: 14px;"><strong>76% Positive / 20% Negative / 4% Neutral</strong></p>
+            <p style="font-size: 14px; font-style: italic;">Dominant Theme: High satisfaction with delivery speed, though quality control and support responsiveness are emerging pain points.</p>
+
+            <div class="section-title">Top Complaints</div>
+            <div class="pill-container">
+                <div class="pill pill-red">Support Dodging/Resolution Delay ~12%</div>
+                <div class="pill pill-red">Food Quality/Safety Concerns ~8%</div>
+                <div class="pill pill-red">Excessive Packaging/Platform Fees ~5%</div>
+            </div>
+
+            <div class="section-title">Top Praises</div>
+            <div class="pill-container">
+                <div class="pill pill-green">Fast/On-time Delivery ~52%</div>
+                <div class="pill pill-green">User-Friendly Interface ~25%</div>
+                <div class="pill pill-green">Good Discounts/Offers ~15%</div>
+            </div>
+
+            <div class="alert-box">
+                <h4>Technical Issues</h4>
+                <ul style="font-size: 13px; margin: 0; padding-left: 15px;">
+                    <li><strong>Chat Interface Bugs:</strong> Support agents closing chat windows while the customer is still typing [Play Store].</li>
+                    <li><strong>Refund Processing:</strong> Significant lag between cancellation and refund credit [Play Store].</li>
+                </ul>
+            </div>
+
+            <div class="section-title">Key Themes</div>
+            <div class="theme-card">
+                <strong>Reliability Preference</strong>
+                Multiple users explicitly state they are "switching from Swiggy to Zomato" due to perceived better dependability.
+            </div>
+            <div class="theme-card">
+                <strong>Quality Control Blindspot</strong>
+                Users report serious health issues (food poisoning) and "rotten" items with no immediate recourse from the platform.
+            </div>
+
+            <div class="section-title">Actionable Recommendations</div>
+            <div class="recommendations">
+                <ul>
+                    <li><strong>Safety Escalation Protocol:</strong> Implement an immediate "Health/Safety" tag in support to handle reports of spoiled food (8% of negative reviews).</li>
+                    <li><strong>Support Decency Standards:</strong> Prevent agents from closing tickets without a final customer acknowledgement (cited as "rude" and "specialized with zero civic sense").</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- MYGATE SECTION -->
+        <div class="app-card">
+            <div class="app-header">
+                <img src="https://play-lh.googleusercontent.com/gTgy9Nvj_jvHIgCq5V0WNghXwbMh0rsgo9kBjzTWcolYfsgmoL9UeGxelK4rY_AvB4AuGyr4HW5cCGcgznyhOg=w480-h960-rw" class="app-logo" alt="MyGate Logo">
+                <div class="app-info">
+                    <h2>MyGate</h2>
+                    <div class="metadata-chip">150 reviews · Play Store · Mar 31 – Apr 29 2026</div>
+                </div>
+                <div class="sentiment-badge badge-orange">Mixed</div>
+            </div>
+
+            <div class="section-title">Overall Sentiment Analysis</div>
+            <div class="sentiment-bar">
+                <div style="width: 58%; background-color: #2f9e44;"></div>
+                <div style="width: 38%; background-color: #e03131;"></div>
+                <div style="width: 4%; background-color: #adb5bd;"></div>
+            </div>
+            <p style="font-size: 14px;"><strong>58% Positive / 38% Negative / 4% Neutral</strong></p>
+            <p style="font-size: 14px; font-style: italic;">Dominant Theme: High utility for society security, severely hampered by intrusive advertising and notification unreliability.</p>
+
+            <div class="section-title">Top Complaints</div>
+            <div class="pill-container">
+                <div class="pill pill-red">Intrusive/Accidental Ads ~35%</div>
+                <div class="pill pill-red">Notification Failures/Delays ~22%</div>
+                <div class="pill pill-red">Poor Technical Support ~12%</div>
+                <div class="pill pill-red">Hidden Platform Fees ~8%</div>
+            </div>
+
+            <div class="section-title">Top Praises</div>
+            <div class="pill-container">
+                <div class="pill pill-green">Security & Visitor Tracking ~40%</div>
+                <div class="pill pill-green">Society Marketplace ~12%</div>
+                <div class="pill pill-green">Emergency Help Features ~10%</div>
+            </div>
+
+            <div class="alert-box">
+                <h4>Technical Issues</h4>
+                <ul style="font-size: 13px; margin: 0; padding-left: 15px;">
+                    <li><strong>Notification Silence:</strong> Notifications arriving without sound or after the visitor has already entered [Play Store].</li>
+                    <li><strong>OTP Delays:</strong> Significant lag (up to 15 mins) in receiving registration OTPs [Play Store].</li>
+                    <li><strong>Loading Screen:</strong> App frequently hangs on the loading screen despite stable internet [Play Store].</li>
+                </ul>
+            </div>
+
+            <div class="section-title">Key Themes</div>
+            <div class="theme-card">
+                <strong>Monetization vs. Utility</strong>
+                Users feel the app is transitioning from a security tool to an "advertisement bulletin board," with ads disguised as society notices.
+            </div>
+            <div class="theme-card">
+                <strong>Critical Path Reliability</strong>
+                For an app managing "critical society operations," the inconsistency of entry notifications is viewed as a major security risk.
+            </div>
+
+            <div class="section-title">Actionable Recommendations</div>
+            <div class="recommendations">
+                <ul>
+                    <li><strong>Ad-Free Critical Paths:</strong> Remove all ads from the "Pre-approval" and "Emergency" menus to prevent accidental clicks during time-sensitive tasks (35% complaint rate).</li>
+                    <li><strong>Notification Audit:</strong> Resolve the bug where notifications lose sound or arrive post-facto (22% of users report this as a failure of the app's core purpose).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SMYTTEN SECTION -->
+        <div class="app-card">
+            <div class="app-header">
+                <img src="https://play-lh.googleusercontent.com/KUjwbiOXHJrDQdKxRCozjltqwXiePh9FntuUtHGSCxdLCRSrAVm__teOVyCOzC4bTw=s96-rw" class="app-logo" alt="Smytten Logo">
+                <div class="app-info">
+                    <h2>Smytten</h2>
+                    <div class="metadata-chip">150 reviews · Play Store · Apr 18–30 2026</div>
+                </div>
+                <div class="sentiment-badge badge-orange">Mixed / Polarized</div>
+            </div>
+
+            <div class="section-title">Overall Sentiment Analysis</div>
+            <div class="sentiment-bar">
+                <div style="width: 52%; background-color: #2f9e44;"></div>
+                <div style="width: 46%; background-color: #e03131;"></div>
+                <div style="width: 2%; background-color: #adb5bd;"></div>
+            </div>
+            <p style="font-size: 14px;"><strong>52% Positive / 46% Negative / 2% Neutral</strong></p>
+            <p style="font-size: 14px; font-style: italic;">Dominant Theme: Users love the "trial" concept but are increasingly frustrated by reward policy changes and logistics delays.</p>
+
+            <div class="section-title">Top Complaints</div>
+            <div class="pill-container">
+                <div class="pill pill-red">Sudden "Bucks" Expiry ~28%</div>
+                <div class="pill pill-red">Long Delivery Delays (15-20 days) ~24%</div>
+                <div class="pill pill-red">Damaged/Expired Products ~18%</div>
+                <div class="pill pill-red">Poor Customer Support ~15%</div>
+            </div>
+
+            <div class="section-title">Top Praises</div>
+            <div class="pill-container">
+                <div class="pill pill-green">Trial/Mini Concept ~45%</div>
+                <div class="pill pill-green">Improved App Speed/Sync ~15%</div>
+                <div class="pill pill-green">Affordable Discovery ~12%</div>
+            </div>
+
+            <div class="alert-box">
+                <h4>Technical Issues</h4>
+                <ul style="font-size: 13px; margin: 0; padding-left: 15px;">
+                    <li><strong>Syncing Freezes:</strong> App becomes completely unresponsive during data synchronization [Play Store].</li>
+                    <li><strong>Wallet Glitches:</strong> "Smytten Bucks" failing to deduct from the total bill during checkout [Play Store].</li>
+                </ul>
+            </div>
+
+            <div class="section-title">Key Themes</div>
+            <div class="theme-card">
+                <strong>Trust Erosion</strong>
+                Sudden changes to reward validity (e.g., 1 year to 60 days) without notice have led to accusations of "fraud" and "cheating."
+            </div>
+            <div class="theme-card">
+                <strong>Performance Paradox</strong>
+                While a recent update improved download speeds, the "syncing" process still renders the app unusable for several seconds.
+            </div>
+
+            <div class="section-title">Actionable Recommendations</div>
+            <div class="recommendations">
+                <ul>
+                    <li><strong>Reward Transparency:</strong> Implement push notifications 7 days prior to "Bucks" expiry to restore user trust (28% of users feel cheated by sudden expiry).</li>
+                    <li><strong>Background Syncing:</strong> Move the synchronization process to a background thread to prevent the UI from freezing (cited by 15% of users as a "real pain").</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- STORE COMPARISON -->
+        <div class="app-card" style="background-color: #f1f3f5; border: none;">
+            <div class="section-title">Store Experience Comparison</div>
+            <p style="font-size: 14px;"><strong>Insufficient data from App Store for reliable analysis.</strong> All current insights are derived from the Play Store. No meaningful cross-platform comparison can be made at this time.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Generated by Product Analyst AI on May 1, 2026 • Based on 600 total reviews
+    </div>
+
+<img alt="" src="http://us-east-1.resend-clicks.com/CI0/0100019de1f0aa45-a0fcdfd7-e35f-414b-8b40-60e2761290e2-000000/6yWWqiZ0_IRMZGHAg2abnrHSn6S5xDNZNpclf7chnJk=452" style="display: none; width: 1px; height: 1px;">
+</body>
+</html>
