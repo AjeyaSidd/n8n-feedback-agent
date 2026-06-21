@@ -1,8 +1,9 @@
 {
+  "name": "App Review",
   "nodes": [
     {
       "parameters": {
-        "jsCode": "// ============================================\n// AGENT CONFIGURATION — edit only this node\n// ============================================\n\nconst config = {\n  \n  // Email to receive the report\n  reportEmail: \"YOUR_EMAIL@example.com\",\n  \n  // Which stores to pull reviews from\n  // Options: \"both\" | \"appstore\" | \"playstore\"\n  stores: \"both\",\n  \n  // Number of recent reviews to fetch per app per store\n  reviewCount: 200,\n\n  // Scraper API base URL — change only here if it ever changes\n  scraperApiUrl: \"https://your-playstore-scraper-api.onrender.com\",\n\n \n  geminiApiUrl: \"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent\",\n  \n  // Apps to analyze\n  // For each app provide:\n  //   name        - friendly name for the report\n  //   appStoreId  - numeric ID from App Store URL (null if not on App Store)\n  //   playStoreId - package name from Play Store URL (null if not on Play Store)\n  //   logourl     - app's logo url from playstore for displaying in the report \n  apps: [\n    {\n      name: \"BigBasket\",\n      appStoreId: \"660683603\",\n      playStoreId: \"com.bigbasket.mobileapp\",\n      logoUrl: \"https://play-lh.googleusercontent.com/EuiZnkT8aEKjXDLX74DTp1VRIwWaeRa8Dvo-LOGAxy1FPQ8GzABTIRenksiM-A7Oz48g=w480-h960-rw\"\n    },\n    {\n    \n      name: \"MyGate\",\n      appStoreId: \"1101762651\",\n      playStoreId: \"com.mygate.user\",\n      logoUrl: \"https://play-lh.googleusercontent.com/gTgy9Nvj_jvHIgCq5V0WNghXwbMh0rsgo9kBjzTWcolYfsgmoL9UeGxelK4rY_AvB4AuGyr4HW5cCGcgznyhOg=w480-h960-rw\"\n    },\n    \n    {\n      name: \"Groww\",\n      appStoreId: \"1404871703\",\n      playStoreId: \"com.nextbillion.groww\",\n      logoUrl: \"https://play-lh.googleusercontent.com/LHjOai6kf1IsstKNWO9jbMxD-ix_FVYaJSLodKCqYQdoFVzQBuV9z5txxzcTagQcyX8=s96-rw\"\n    },\n    {\n      name: \"Zerodha\",\n      appStoreId: \"1449453802\",\n      playStoreId: \"com.zerodha.kite3\",\n      logoUrl: \"https://play-lh.googleusercontent.com/wnNYBAH1m-XJMfduOHfEATQAhCwyKUYeHAD1Fi9-OjtxKyPKjFEmgWvbx-OX2dM65xjp=s96-rw\"\n    },\n    {\n      name: \"Home Workout\",\n      appStoreId: \"313192037\",\n      playStoreId: \"homeworkout.homeworkouts.noequipment\",\n      logoUrl: \"https://play-lh.googleusercontent.com/NlQFS5pgo96dzbRuwZfkBhGf3ecKSGH5lRx0DSsmELYZXRYHlXrd7YVCR7tS7-R84eEVLhZ1qBIQj1WP_RCJAQ=w480-h960-rw\"\n    }\n  ]\n\n};\n\n// Pass config forward to next nodes\nreturn [{ json: config }];"
+        "jsCode": "// ============================================\n// AGENT CONFIGURATION — edit only this node\n// ============================================\n\nconst config = {\n  \n  // Email to receive the report\n  reportEmail: \"ajeyasiddharth@gmail.com\",\n  \n  // Which stores to pull reviews from\n  // Options: \"both\" | \"appstore\" | \"playstore\"\n  stores: \"both\",\n  \n  // Number of recent reviews to fetch per app per store\n  reviewCount: 200,\n\n  // Scraper API base URL — change only here if it ever changes\n  scraperApiUrl: \"https://google-play-api-z57i.onrender.com\",\n\n \n  geminiApiUrl: \"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent\",\n  \n  // Apps to analyze\n  // For each app provide:\n  //   name        - friendly name for the report\n  //   appStoreId  - numeric ID from App Store URL (null if not on App Store)\n  //   playStoreId - package name from Play Store URL (null if not on Play Store)\n  //   logourl     - app's logo url from playstore for displaying in the report \n  apps: [\n    {\n      name: \"BigBasket\",\n      appStoreId: \"660683603\",\n      playStoreId: \"com.bigbasket.mobileapp\",\n      logoUrl: \"https://play-lh.googleusercontent.com/EuiZnkT8aEKjXDLX74DTp1VRIwWaeRa8Dvo-LOGAxy1FPQ8GzABTIRenksiM-A7Oz48g=w480-h960-rw\"\n    },\n    {\n    \n      name: \"MyGate\",\n      appStoreId: \"1101762651\",\n      playStoreId: \"com.mygate.user\",\n      logoUrl: \"https://play-lh.googleusercontent.com/gTgy9Nvj_jvHIgCq5V0WNghXwbMh0rsgo9kBjzTWcolYfsgmoL9UeGxelK4rY_AvB4AuGyr4HW5cCGcgznyhOg=w480-h960-rw\"\n    },\n    \n    {\n      name: \"Groww\",\n      appStoreId: \"1404871703\",\n      playStoreId: \"com.nextbillion.groww\",\n      logoUrl: \"https://play-lh.googleusercontent.com/LHjOai6kf1IsstKNWO9jbMxD-ix_FVYaJSLodKCqYQdoFVzQBuV9z5txxzcTagQcyX8=s96-rw\"\n    },\n    {\n      name: \"Zerodha\",\n      appStoreId: \"1449453802\",\n      playStoreId: \"com.zerodha.kite3\",\n      logoUrl: \"https://play-lh.googleusercontent.com/wnNYBAH1m-XJMfduOHfEATQAhCwyKUYeHAD1Fi9-OjtxKyPKjFEmgWvbx-OX2dM65xjp=s96-rw\"\n    },\n    {\n      name: \"Home Workout\",\n      appStoreId: \"313192037\",\n      playStoreId: \"homeworkout.homeworkouts.noequipment\",\n      logoUrl: \"https://play-lh.googleusercontent.com/NlQFS5pgo96dzbRuwZfkBhGf3ecKSGH5lRx0DSsmELYZXRYHlXrd7YVCR7tS7-R84eEVLhZ1qBIQj1WP_RCJAQ=w480-h960-rw\"\n    }\n  ]\n\n};\n\n// Pass config forward to next nodes\nreturn [{ json: config }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -194,7 +195,7 @@
         "genericAuthType": "httpCustomAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"from\": \"onboarding@resend.dev\",\n  \"to\": \"YOUR_EMAIL@example.com\",\n  \"subject\": \"App Review Report — {{$now.toFormat('d MMMM yyyy')}}\",\n  \"text\": \"Hello, please find the attached weekly App Review Report.\",\n  \"attachments\": [\n    {\n      \"filename\": \"App_Review_Report.html\",\n      \"content\": \"{{$json.reportBase64}}\"\n    }\n  ]\n}",
+        "jsonBody": "={\n  \"from\": \"onboarding@resend.dev\",\n  \"to\": \"ajeyasiddharth@gmail.com\",\n  \"subject\": \"App Review Report — {{$now.toFormat('d MMMM yyyy')}}\",\n  \"text\": \"Hello, please find the attached weekly App Review Report.\",\n  \"attachments\": [\n    {\n      \"filename\": \"App_Review_Report.html\",\n      \"content\": \"{{$json.reportBase64}}\"\n    }\n  ]\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -239,23 +240,13 @@
       "name": "When clicking ‘Execute workflow’"
     }
   ],
+  "pinData": {},
   "connections": {
     "Config": {
       "main": [
         [
           {
             "node": "Split Out (send each app from Config)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Combine Reviews": {
-      "main": [
-        [
-          {
-            "node": "Create Prompt for review analysis",
             "type": "main",
             "index": 0
           }
@@ -305,6 +296,17 @@
           },
           {
             "node": "Get PlayStore Reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Reviews": {
+      "main": [
+        [
+          {
+            "node": "Create Prompt for review analysis",
             "type": "main",
             "index": 0
           }
@@ -372,8 +374,19 @@
       ]
     }
   },
-  "pinData": {},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "4875d639-adc8-4301-b670-32d6351371ca",
   "meta": {
     "instanceId": "f0edf472df03952e9c7a4c2cd6ecfb5b782835e0bc1575f824085cd667b1d79d"
-  }
+  },
+  "nodeGroups": [],
+  "id": "qG7OD0pICEQnIECO",
+  "tags": []
 }
